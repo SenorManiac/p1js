@@ -19,9 +19,9 @@ function bookInfo(title, author, pages, read) {
     this.author = author;
     this.pages = pages;
     this.read = read;
-    if(this.read === 'on') {read ='Yes'} else {read = 'Not Read'};
+    this.read = read ? 'Yes' : 'Not Read'; 
     this.info = function() {
-        return [this.title, this.author, this.pages, read];
+        return [this.title, this.author, this.pages, this.read];
     }
 }
 
@@ -46,7 +46,7 @@ submit.addEventListener('click', () => {
         alert('This book already exists in the library');
         return;
     } else {
-        let book = new bookInfo(title.value, author.value, pages.value, read.value);
+        let book = new bookInfo(title.value, author.value, pages.value, read.checked);
         addBookToLibrary(book);
         console.log(myLibrary);
         displayBooks();
@@ -67,9 +67,10 @@ function displayBooks() {
     let buttonid = `button${myLibrary.length - 1}`;
     let lastBook = myLibrary[myLibrary.length - 1];
     let books = lastBook.info();
-    list.innerHTML += `<tr id="${rowid}">${books.map(item => `<td>${item}</td>`).join('')}<td><button class ="remove" id="${buttonid}">x</button></tr>`;
+    list.innerHTML += `<tr id="${rowid}">${books.map(item => `<td>${item}</td>`).join('')}<td><button class ="remove" id="${buttonid}">x</button><td><button class="finished-reading">Yes</button></tr>`;
     if (x == 0){
-        header.appendChild(document.createElement("th")).textContent = 'Remove'; 
+        header.appendChild(document.createElement("th")).textContent = 'Remove';
+        header.appendChild(document.createElement("th")).textContent = 'Finished Reading'; 
         x = 1} 
     
    
@@ -84,5 +85,15 @@ list.addEventListener('click', (e) => {
             row.remove(); // Remove the row from the DOM
             myLibrary.splice(index - 1, 1); // Adjust index if there's a header row
         }
+    }
+});
+
+list.addEventListener('click', (e) => { 
+    if (e.target.classList.contains('finished-reading')) {    
+        if (confirm('Did you read this book?')) {
+            let row = e.target.parentElement.parentElement;
+            let index = row.rowIndex;
+            myLibrary[index - 1].read = 'Yes';
+            row.cells[3].textContent = 'Yes';}
     }
 });
